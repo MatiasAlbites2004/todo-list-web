@@ -1,25 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { GlobalStyle } from "./styles/GlobalStyle";
-import ToDo from "./pages/ToDo";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import React from "react";
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
 
-export default function App() {
+const App: React.FC = () => {
   const isAuthenticated = false; 
 
   return (
     <BrowserRouter>
-      <GlobalStyle />
-      <Routes>
-        <Route path="/" element={<Navigate to="/auth/login" />} />
-
-        <Route
-          path="/to-do"
-          element={isAuthenticated ? <ToDo /> : <Navigate to="/auth/login" />}
-        />
-        <Route path="/auth/login" element={<Login />} />
-        <Route path="/auth/register" element={<Register />} />
-      </Routes>
+      <AppRoutes isAuthenticated={isAuthenticated} />
     </BrowserRouter>
   );
-}
+};
+
+export default App;
