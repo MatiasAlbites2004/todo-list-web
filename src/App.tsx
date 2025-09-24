@@ -1,14 +1,19 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
+import { GlobalStyle } from "./styles/GlobalStyle";
+import "./styles/variables.css";
 
 const App: React.FC = () => {
   const isAuthenticated = false; 
 
   return (
-    <BrowserRouter>
-      <AppRoutes isAuthenticated={isAuthenticated} />
-    </BrowserRouter>
+    <>
+      <GlobalStyle />
+      <BrowserRouter>
+        <AppRoutes isAuthenticated={isAuthenticated} />
+      </BrowserRouter>
+    </>
   );
 };
 
