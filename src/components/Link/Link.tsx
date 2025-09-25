@@ -1,5 +1,5 @@
 import React from "react";
-import styled from "styled-components";
+import { StyledLink } from "./Link.styled";
 
 interface Props {
   href: string;
@@ -7,15 +7,7 @@ interface Props {
   target?: string;
 }
 
-const StyledLink = styled.a`
-  color: #4f46e5;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const Link: React.FC<Props> = ({ href, children, target = "_self" }) => {
+const Link: React.FC<Props> = ({ href, children, target }) => {
   return (
     <StyledLink href={href} target={target}>
       {children}

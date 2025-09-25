@@ -2,58 +2,61 @@ import styled from "styled-components";
 
 export const LoginWrapper = styled.div`
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   min-height: 100vh;
   background: var(--color-secondary);
-  padding: 2rem;
   font-family: var(--font-primary);
+  padding: 2rem;
+`;
+
+export const Card = styled.div`
+  background: #fff;
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 460px; 
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media (max-width: 600px) {
+    padding: 2rem;
+    max-width: 95%;
+  }
 `;
 
 export const Title = styled.h1`
+  font-size: 1.6rem;
+  font-weight: 700;
   color: var(--color-text);
-  margin-bottom: 2rem;
+  margin-bottom: 2rem; 
+  text-align: center;
 `;
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 1rem;
   width: 100%;
-  max-width: 320px;
+  margin-top: 1.5rem; 
 `;
 
-// 👇 $error tipado como boolean
-export const Input = styled.input<{ $error?: boolean }>`
-  width: 100%;
-  max-width: 300px;
-  padding: 0.8rem;
-  border-radius: var(--border-radius);
-  border: 1px solid
-    ${({ $error }) => ($error ? "red" : "var(--color-border)")};
-  font-size: var(--font-size-medium);
-  box-sizing: border-box;
-  outline: none;
 
-  &:focus {
-    border-color: ${({ $error }) =>
-      $error ? "red" : "var(--color-primary)"};
-    box-shadow: 0 0 0 2px
-      ${({ $error }) => ($error ? "rgba(255,0,0,0.2)" : "rgba(79,70,229,0.2)")};
-  }
-`;
-
-export const TextCenter = styled.div`
-  text-align: center;
-  margin-top: 1rem;
+export const Footer = styled.div`
+  margin-top: 2rem;
   font-size: var(--font-size-small);
   color: var(--color-text-light);
-`;
+  text-align: center;
 
-export const ErrorMessage = styled.p`
-  color: red;
-  font-size: var(--font-size-small);
-  margin: 0.25rem 0 0;
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;

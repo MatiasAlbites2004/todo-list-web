@@ -1,31 +1,23 @@
 import React from "react";
-import styled from "styled-components";
+import * as S from "./TextField.styled";
 
-interface Props {
-  type?: "text" | "email" | "password";
-  value: string;
-  placeholder?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
 }
 
-const StyledInput = styled.input`
-  width: 100%;
-  max-width: 300px;
-  padding: 0.8rem;
-  border-radius: var(--border-radius);
-  border: 1px solid var(--color-border);
-  font-size: var(--font-size-medium);
-  font-family: var(--font-primary);
-  box-sizing: border-box;
-
-  &:focus {
-    outline: none;
-    border-color: var(--color-primary);
+const TextField = React.forwardRef<HTMLInputElement, Props>(
+  ({ label, error, ...props }, ref) => {
+    return (
+      <S.Wrapper>
+        {label && <S.Label>{label}</S.Label>}
+        <S.StyledInput ref={ref} {...props} $error={!!error} />
+        {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
+      </S.Wrapper>
+    );
   }
-`;
+);
 
-const TextField: React.FC<Props> = ({ type = "text", value, placeholder, onChange }) => {
-  return <StyledInput type={type} value={value} placeholder={placeholder} onChange={onChange} />;
-};
+TextField.displayName = "TextField";
 
 export default TextField;

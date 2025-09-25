@@ -1,17 +1,23 @@
 import styled from "styled-components";
 
-export const StyledButton = styled.button`
-  padding: 0.5rem 1rem;
-  background-color: var(--color-button);
+export const StyledButton = styled.button<{ $fullWidth?: boolean }>`
+  background: var(--color-primary);
   color: white;
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
   font-weight: 600;
-  font-family: var(--font-primary);
-  transition: background-color 0.2s;
+  font-size: var(--font-size-medium);
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease-in-out;
+  width: ${({ $fullWidth }) => ($fullWidth ? "100%" : "auto")};
 
   &:hover {
-    background-color: var(--color-button-hover);
+    background: var(--color-primary-dark);
+  }
+
+  &:disabled {
+    background: var(--color-disabled);
+    cursor: not-allowed;
   }
 `;

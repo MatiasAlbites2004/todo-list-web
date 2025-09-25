@@ -1,27 +1,17 @@
 import React from "react";
-import styled from "styled-components";
+import * as S from "./Container.styled";
 
-interface Props {
+interface ContainerProps {
   children: React.ReactNode;
   maxWidth?: string;
   padding?: string;
 }
 
-const StyledContainer = styled.div<{ maxWidth?: string; padding?: string }>`
-  width: 100%;
-  max-width: ${(props) => props.maxWidth || "1200px"};
-  padding: ${(props) => props.padding || "2rem"};
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const Container: React.FC<Props> = ({ children, maxWidth, padding }) => {
+const Container: React.FC<ContainerProps> = ({ children, maxWidth, padding }) => {
   return (
-    <StyledContainer maxWidth={maxWidth} padding={padding}>
+    <S.StyledContainer maxWidth={maxWidth} padding={padding}>
       {children}
-    </StyledContainer>
+    </S.StyledContainer>
   );
 };
 
