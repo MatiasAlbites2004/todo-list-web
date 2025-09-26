@@ -1,4 +1,5 @@
 import React from "react";
+import type { CSSProperties } from "react";
 import { TypographyStyled } from "./Typography.styled";
 
 type FontSize = "sm" | "md" | "lg" | "xl";
@@ -11,6 +12,7 @@ interface TypographyProps {
   weight?: FontWeight;
   color?: string;
   className?: string;
+  style?: CSSProperties;
 }
 
 const Typography: React.FC<TypographyProps> = ({
@@ -20,6 +22,7 @@ const Typography: React.FC<TypographyProps> = ({
   weight = "normal",
   color,
   className,
+  style, 
 }) => {
   return (
     <TypographyStyled
@@ -28,6 +31,7 @@ const Typography: React.FC<TypographyProps> = ({
       $weight={weight}
       $color={color}
       className={className}
+      style={style}
     >
       {children}
     </TypographyStyled>
