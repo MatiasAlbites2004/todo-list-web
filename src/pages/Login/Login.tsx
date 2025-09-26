@@ -9,6 +9,7 @@ import TextField from "../../components/TextField/TextField";
 import Link from "../../components/Link/Link";
 import Typography from "../../components/Typography/Typography";
 import * as S from "./Login.styled";
+import Card from "../../components/Card/Card";
 
 const Login: React.FC = () => {
   const {
@@ -20,12 +21,17 @@ const Login: React.FC = () => {
   });
 
   const onSubmit = (data: LoginFormValues) => {
-    console.log(" Datos enviados:", data);
+    console.log("Datos enviados:", data);
   };
 
   return (
     <S.LoginWrapper>
-      <S.Card>
+      <Card
+        padding="3rem 2.5rem"
+        borderRadius="20px"
+        boxShadow="0 8px 28px rgba(0, 0, 0, 0.1)"
+        maxWidth="460px"
+      >
         <Typography as="h1" size="xl" weight="bold">
           Iniciar Sesión
         </Typography>
@@ -53,7 +59,7 @@ const Login: React.FC = () => {
         <S.Footer>
           ¿No tienes cuenta? <Link href="/register">Regístrate</Link>
         </S.Footer>
-      </S.Card>
+      </Card>
     </S.LoginWrapper>
   );
 };
