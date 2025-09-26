@@ -1,17 +1,17 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { RegisterFormValues } from "./registerSchema.ts";
-import { registerSchema } from "./registerSchema.ts";
+import { registerSchema } from "./registerSchema";
+import type { RegisterFormValues } from "./registerSchema";
 
 import Card from "../../components/Card/Card";
-import Button from "../../components/Button/Button";
 import TextField from "../../components/TextField/TextField";
-import Link from "../../components/Link/Link";
+import Button from "../../components/Button/Button";
 import Typography from "../../components/Typography/Typography";
-
+import Link from "../../components/Link/Link";
 import * as S from "./Register.styled";
 
-const Register = () => {
+const Register: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -21,14 +21,24 @@ const Register = () => {
   });
 
   const onSubmit = (data: RegisterFormValues) => {
-    console.log(" Datos enviados:", data);
+    console.log("Datos enviados:", data);
   };
 
   return (
     <S.RegisterWrapper>
-      <Card maxWidth="400px" padding="2.5rem">
-        <Typography as="h1" size="xl" weight="bold" style={{ marginBottom: "2rem" }}>
-          Crear cuenta
+      <Card
+        padding="2.5rem"
+        borderRadius="16px"
+        boxShadow="0 4px 20px rgba(0,0,0,0.08)"
+        maxWidth="420px"
+      >
+        <Typography
+          as="h1"
+          size="xl"
+          weight="bold"
+          className="register-title"
+        >
+          Crear Cuenta
         </Typography>
 
         <S.Form onSubmit={handleSubmit(onSubmit)}>
@@ -53,13 +63,20 @@ const Register = () => {
             error={errors.password?.message}
           />
 
+          <TextField
+            type="password"
+            placeholder="Confirmar contraseña"
+            {...register("confirmPassword")}
+            error={errors.confirmPassword?.message}
+          />
+
           <Button type="submit" fullWidth>
-            Registrarme
+            Registrarse
           </Button>
         </S.Form>
 
         <S.Footer>
-          ¿Ya tienes cuenta? <Link href="/login">Inicia sesión</Link>
+          ¿Ya tienes cuenta? <Link href="/login">Inicia Sesión</Link>
         </S.Footer>
       </Card>
     </S.RegisterWrapper>
