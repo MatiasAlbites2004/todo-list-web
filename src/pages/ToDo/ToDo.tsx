@@ -1,68 +1,65 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
 import * as S from "./ToDo.styled";
 import FloatingButton from "../../components/FloatingButton/FloatingButton";
 import Modal from "../../components/Modal/Modal";
 import Button from "../../components/Button/Button";
+import TextField from "../../components/TextField/TextField";
+import { addTask, updateTask, deleteTask, setEditingTaskId } from "../../store/todoSlice";
+import type { Task } from "../../store/todoSlice";
+import type { RootState, AppDispatch } from "../../store";
 
-interface Task {
-  id: number;
+interface FormValues {
   title: string;
   desc: string;
 }
 
 const TodoList: React.FC = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  const tasks = useSelector((state: RootState) => state.todo.tasks);
+  const editingTaskId = useSelector((state: RootState) => state.todo.editingTaskId);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [title, setTitle] = useState("");
-  const [desc, setDesc] = useState("");
-  const [editingId, setEditingId] = useState<number | null>(null);
+
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormValues>();
+
+  useEffect(() => {
+    if (editingTaskId !== null) {
+      const task = tasks.find((t) => t.id === editingTaskId);
+      if (task) {
+        setValue("title", task.title);
+        setValue("desc", task.desc);
+      }
+    } else {
+      reset();
+    }
+  }, [editingTaskId, tasks, setValue, reset]);
 
   const openModal = (task?: Task) => {
-    if (task) {
-      setEditingId(task.id);
-      setTitle(task.title);
-      setDesc(task.desc);
-    } else {
-      setEditingId(null);
-      setTitle("");
-      setDesc("");
-    }
+    const taskToEdit = task || null;
+    dispatch(setEditingTaskId(taskToEdit?.id ?? null));
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setTitle("");
-    setDesc("");
-    setEditingId(null);
+    dispatch(setEditingTaskId(null));
+    reset();
   };
 
-  const handleAddTask = () => {
-    if (!title.trim()) return;
-
-    if (editingId !== null) {
-      setTasks((prev) =>
-        prev.map((t) =>
-          t.id === editingId ? { ...t, title, desc } : t
-        )
-      );
+  const onSubmit = (data: FormValues) => {
+    if (editingTaskId !== null) {
+      dispatch(updateTask({ id: editingTaskId, title: data.title, desc: data.desc }));
     } else {
-      const newTask: Task = { id: Date.now(), title, desc };
-      setTasks((prev) => [...prev, newTask]);
+      dispatch(addTask({ title: data.title, desc: data.desc }));
     }
-
     closeModal();
-  };
-
-  const handleDelete = (id: number) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
   };
 
   return (
     <S.Wrapper>
       <S.Container>
         <S.Title>Mis Tareas</S.Title>
-
         {tasks.length === 0 ? (
           <S.EmptyText>No hay tareas todavía</S.EmptyText>
         ) : (
@@ -75,9 +72,7 @@ const TodoList: React.FC = () => {
                 </S.TaskInfo>
                 <S.Actions>
                   <Button onClick={() => openModal(task)}>Editar</Button>
-                  <Button onClick={() => handleDelete(task.id)}>
-                    Eliminar
-                  </Button>
+                  <Button onClick={() => dispatch(deleteTask(task.id))}>Eliminar</Button>
                 </S.Actions>
               </S.TodoItem>
             ))}
@@ -85,28 +80,34 @@ const TodoList: React.FC = () => {
         )}
       </S.Container>
 
-      <FloatingButton onClick={() => openModal()} />
+      <FloatingButton onClick={openModal} />
 
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
-        title={editingId !== null ? "Editar tarea" : "Agregar tarea"}
+        title={editingTaskId !== null ? "Editar tarea" : "Agregar tarea"}
       >
         <S.ModalContent>
-          <S.Input
-            type="text"
-            placeholder="Título de la tarea"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
-          <S.Textarea
-            placeholder="Descripción (opcional)"
-            value={desc}
-            onChange={(e) => setDesc(e.target.value)}
-          />
-          <Button onClick={handleAddTask} fullWidth>
-            {editingId !== null ? "Guardar cambios" : "Agregar"}
-          </Button>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <S.FormFields>
+              <TextField
+                {...register("title", { required: "El título es obligatorio" })}
+                placeholder="Título de la tarea"
+                error={errors.title?.message}
+              />
+              <TextField
+                {...register("desc")}
+                placeholder="Descripción (opcional)"
+                multiline
+              />
+            </S.FormFields>
+
+            <S.FormActions>
+              <Button type="submit" fullWidth>
+                {editingTaskId !== null ? "Guardar cambios" : "Agregar"}
+              </Button>
+            </S.FormActions>
+          </form>
         </S.ModalContent>
       </Modal>
     </S.Wrapper>

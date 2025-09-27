@@ -2,16 +2,23 @@ import React from "react";
 import * as S from "./TextField.styled";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
   error?: string;
+  multiline?: boolean;
 }
 
-const TextField = React.forwardRef<HTMLInputElement, Props>(
-  ({ label, error, ...props }, ref) => {
+const TextField = React.forwardRef<HTMLInputElement | HTMLTextAreaElement, Props>(
+  ({ error, multiline, ...props }, ref) => {
     return (
       <S.Wrapper>
-        {label && <S.Label>{label}</S.Label>}
-        <S.StyledInput ref={ref} {...props} $error={!!error} />
+        {multiline ? (
+          <S.StyledTextarea
+            {...(props as React.TextareaHTMLAttributes<HTMLTextAreaElement>)}
+            ref={ref as React.Ref<HTMLTextAreaElement>}
+            $error={!!error}
+          />
+        ) : (
+          <S.StyledInput ref={ref as React.Ref<HTMLInputElement>} {...props} $error={!!error} />
+        )}
         {error && <S.ErrorMessage>{error}</S.ErrorMessage>}
       </S.Wrapper>
     );

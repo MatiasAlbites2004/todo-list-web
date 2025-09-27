@@ -79,31 +79,17 @@ export const EmptyText = styled.p`
 export const ModalContent = styled.div`
   display: flex;
   flex-direction: column;
+`;
+
+export const FormFields = styled.div`
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
+  margin-bottom: 1rem;
 `;
 
-export const Input = styled.input`
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  font-size: 1rem;
-  outline: none;
-
-  &:focus {
-    border-color: var(--color-primary);
-  }
-`;
-
-export const Textarea = styled.textarea`
-  padding: 0.8rem;
-  border-radius: 8px;
-  border: 1px solid var(--color-border);
-  font-size: 1rem;
-  resize: none;
-  outline: none;
-  min-height: 100px;
-
-  &:focus {
-    border-color: var(--color-primary);
-  }
+export const FormActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
 `;
