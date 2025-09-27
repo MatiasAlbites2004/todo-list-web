@@ -24,7 +24,7 @@ export const Button = styled.button`
   }
 
   span {
-    display: none; /* Si quieres texto, cámbialo a inline */
+    display: none;
     margin-left: 8px;
   }
 `;

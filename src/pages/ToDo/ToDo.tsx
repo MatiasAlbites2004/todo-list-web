@@ -41,14 +41,12 @@ const TodoList: React.FC = () => {
     if (!title.trim()) return;
 
     if (editingId !== null) {
-      // editar
       setTasks((prev) =>
         prev.map((t) =>
           t.id === editingId ? { ...t, title, desc } : t
         )
       );
     } else {
-      // agregar
       const newTask: Task = { id: Date.now(), title, desc };
       setTasks((prev) => [...prev, newTask]);
     }
