@@ -5,13 +5,11 @@ import { GlobalStyle } from "./styles/GlobalStyle";
 import "./styles/variables.css";
 
 const App: React.FC = () => {
-  const isAuthenticated = false; 
-
   return (
     <>
       <GlobalStyle />
       <BrowserRouter>
-        <AppRoutes isAuthenticated={isAuthenticated} />
+        <AppRoutes />
       </BrowserRouter>
     </>
   );
