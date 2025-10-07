@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "./registerSchema";
 import type { RegisterFormValues } from "./registerSchema";
-
 import Swal from "sweetalert2";
 
 import Card from "../../components/Card/Card";
@@ -13,9 +12,12 @@ import Typography from "../../components/Typography/Typography";
 import Link from "../../components/Link/Link";
 import * as S from "./Register.styled";
 
-const API_URL = "http://localhost:3000/auth/register";
+import { useAppDispatch } from "../../store/hooks";
+import { registerUserThunk } from "../../store/authSlice";
 
 const Register: React.FC = () => {
+  const dispatch = useAppDispatch();
+
   const {
     register,
     handleSubmit,
@@ -29,24 +31,10 @@ const Register: React.FC = () => {
     try {
       const { name, email, password } = data;
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Error al registrar usuario");
-      }
-
-      localStorage.setItem("token", result.token);
+      await dispatch(registerUserThunk({ name, email, password })).unwrap();
 
       Swal.fire({
-        title: "¡Registro exitoso! ",
+        title: "¡Registro exitoso!",
         text: "Tu cuenta ha sido creada correctamente.",
         icon: "success",
         confirmButtonText: "Aceptar",
@@ -54,11 +42,9 @@ const Register: React.FC = () => {
 
       reset();
     } catch (error: any) {
-      console.error("Error:", error.message);
-
       Swal.fire({
         title: "Error",
-        text: error.message || "No se pudo registrar el usuario.",
+        text: error || "No se pudo registrar el usuario.",
         icon: "error",
         confirmButtonText: "Intentar de nuevo",
       });
