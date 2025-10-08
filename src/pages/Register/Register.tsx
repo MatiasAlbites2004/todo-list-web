@@ -14,9 +14,11 @@ import * as S from "./Register.styled";
 
 import { useAppDispatch } from "../../store/hooks";
 import { registerUserThunk } from "../../store/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Register: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -41,6 +43,7 @@ const Register: React.FC = () => {
       });
 
       reset();
+      navigate("/login"); 
     } catch (error: any) {
       Swal.fire({
         title: "Error",
