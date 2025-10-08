@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { LoginFormValues } from "./loginSchema";
 import { loginSchema } from "./loginSchema";
+import Swal from "sweetalert2";
 
 import Button from "../../components/Button/Button";
 import TextField from "../../components/TextField/TextField";
@@ -11,17 +12,42 @@ import Typography from "../../components/Typography/Typography";
 import * as S from "./Login.styled";
 import Card from "../../components/Card/Card";
 
+import { useAppDispatch } from "../../store/hooks";
+import { loginUserThunk } from "../../store/authSlice";
+
 const Login: React.FC = () => {
+  const dispatch = useAppDispatch();
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginFormValues) => {
-    console.log("Datos enviados:", data);
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      await dispatch(loginUserThunk(data)).unwrap();
+
+      Swal.fire({
+        title: "¡Bienvenido!",
+        text: "Has iniciado sesión correctamente.",
+        icon: "success",
+        confirmButtonText: "Continuar",
+      });
+
+      reset();
+
+    } catch (error: any) {
+      Swal.fire({
+        title: "Error",
+        text: error || "No se pudo iniciar sesión.",
+        icon: "error",
+        confirmButtonText: "Intentar de nuevo",
+      });
+    }
   };
 
   return (

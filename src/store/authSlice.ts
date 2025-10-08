@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { registerUser } from "../services/auth.service";
+import { registerUser, loginUser } from "../services/auth.service";
 
 interface AuthState {
   token: string | null;
@@ -29,6 +29,22 @@ export const registerUserThunk = createAsyncThunk(
   }
 );
 
+export const loginUserThunk = createAsyncThunk(
+  "auth/loginUser",
+  async (
+    data: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const result = await loginUser(data);
+      localStorage.setItem("token", result.token);
+      return result.token;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -44,6 +60,18 @@ const authSlice = createSlice({
         state.token = action.payload;
       })
       .addCase(registerUserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(loginUserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loginUserThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload;
+      })
+      .addCase(loginUserThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
