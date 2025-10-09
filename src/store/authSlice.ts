@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { registerUser, loginUser } from "../services/auth.service";
+import { registerUser, loginUser, refreshToken } from "../services/auth.service";
 
 interface User {
   id: string;
@@ -49,6 +49,22 @@ export const loginUserThunk = createAsyncThunk(
   }
 );
 
+export const refreshTokenThunk = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await refreshToken();
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+        return result.token;
+      }
+      return rejectWithValue("Token inválido");
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -85,10 +101,21 @@ const authSlice = createSlice({
       .addCase(loginUserThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(refreshTokenThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(refreshTokenThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload;
+      })
+      .addCase(refreshTokenThunk.rejected, (state) => {
+        state.loading = false;
+        state.token = null;
+        localStorage.removeItem("token");
       });
   },
 });
 
 export const { logout } = authSlice.actions;
-
 export default authSlice.reducer;
