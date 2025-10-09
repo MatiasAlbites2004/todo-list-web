@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../store/hooks";
+import { useAppDispatch } from "../store/hooks";
 import { refreshTokenThunk } from "../store/authSlice";
 
 interface PrivateRouteProps {
@@ -9,15 +9,14 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const token = useAppSelector((state) => state.auth.token);
   const [isChecking, setIsChecking] = useState(true);
   const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
     const verifyToken = async () => {
       try {
-        const newToken = await dispatch(refreshTokenThunk()).unwrap();
-        if (newToken) {
+        const data = await dispatch(refreshTokenThunk()).unwrap();
+        if (data?.token) {
           setIsValid(true);
         } else {
           setIsValid(false);
