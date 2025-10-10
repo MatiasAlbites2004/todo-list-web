@@ -1,14 +1,22 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { registerUser, loginUser } from "../services/auth.service";
+import { registerUser, loginUser, refreshToken } from "../services/auth.service";
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
 interface AuthState {
   token: string | null;
+  user: User | null;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: AuthState = {
   token: localStorage.getItem("token"),
+  user: null,
   loading: false,
   error: null,
 };
@@ -21,8 +29,7 @@ export const registerUserThunk = createAsyncThunk(
   ) => {
     try {
       const result = await registerUser(data);
-      localStorage.setItem("token", result.token);
-      return result.token;
+      return result.user;
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -31,14 +38,27 @@ export const registerUserThunk = createAsyncThunk(
 
 export const loginUserThunk = createAsyncThunk(
   "auth/loginUser",
-  async (
-    data: { email: string; password: string },
-    { rejectWithValue }
-  ) => {
+  async (data: { email: string; password: string }, { rejectWithValue }) => {
     try {
       const result = await loginUser(data);
       localStorage.setItem("token", result.token);
-      return result.token;
+      return { user: result.user, token: result.token };
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const refreshTokenThunk = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const result = await refreshToken();
+      if (result.token) {
+        localStorage.setItem("token", result.token);
+        return result.token;
+      }
+      return rejectWithValue("Token inválido");
     } catch (error: any) {
       return rejectWithValue(error.message);
     }
@@ -48,7 +68,13 @@ export const loginUserThunk = createAsyncThunk(
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      state.token = null;
+      state.user = null;
+      localStorage.removeItem("token");
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUserThunk.pending, (state) => {
@@ -57,7 +83,7 @@ const authSlice = createSlice({
       })
       .addCase(registerUserThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
+        state.user = action.payload;
       })
       .addCase(registerUserThunk.rejected, (state, action) => {
         state.loading = false;
@@ -69,13 +95,27 @@ const authSlice = createSlice({
       })
       .addCase(loginUserThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
       })
       .addCase(loginUserThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(refreshTokenThunk.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(refreshTokenThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.token = action.payload;
+      })
+      .addCase(refreshTokenThunk.rejected, (state) => {
+        state.loading = false;
+        state.token = null;
+        localStorage.removeItem("token");
       });
   },
 });
 
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
