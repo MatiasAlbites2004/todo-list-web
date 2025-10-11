@@ -1,9 +1,11 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const registerUser = async (data: {
   name: string;
   email: string;
   password: string;
 }) => {
-  const res = await fetch("http://localhost:3000/auth/register", {
+  const res = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -18,7 +20,7 @@ export const registerUser = async (data: {
 };
 
 export const loginUser = async (data: { email: string; password: string }) => {
-  const res = await fetch("http://localhost:3000/auth/login", {
+  const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -35,7 +37,7 @@ export const loginUser = async (data: { email: string; password: string }) => {
 export const refreshToken = async () => {
   const token = localStorage.getItem("token");
 
-  const res = await fetch("http://localhost:3000/auth/refresh", {
+  const res = await fetch(`${API_URL}/auth/refresh`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
