@@ -21,11 +21,11 @@ const todoSlice = createSlice({
   name: "todo",
   initialState,
   reducers: {
-    addTask: (
-      state,
-      action: PayloadAction<{ title: string; desc: string }>
-    ) => {
-      state.tasks.push({ id: Date.now(), ...action.payload });
+    setTasks: (state, action: PayloadAction<Task[]>) => {
+      state.tasks = action.payload;
+    },
+    addTask: (state, action: PayloadAction<Task>) => {
+      state.tasks.push(action.payload);
     },
     updateTask: (state, action: PayloadAction<Task>) => {
       state.tasks = state.tasks.map((t) =>
@@ -41,6 +41,6 @@ const todoSlice = createSlice({
   },
 });
 
-export const { addTask, updateTask, deleteTask, setEditingTaskId } =
+export const { setTasks, addTask, updateTask, deleteTask, setEditingTaskId } =
   todoSlice.actions;
 export default todoSlice.reducer;

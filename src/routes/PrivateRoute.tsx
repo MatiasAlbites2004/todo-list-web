@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { useAppDispatch } from "../store/hooks";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
 import { refreshTokenThunk } from "../store/authSlice";
 
 interface PrivateRouteProps {
@@ -10,30 +10,27 @@ interface PrivateRouteProps {
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const [isChecking, setIsChecking] = useState(true);
-  const [isValid, setIsValid] = useState(false);
+  const token = useAppSelector((state) => state.auth.token);
 
   useEffect(() => {
     const verifyToken = async () => {
+      if (!token) {
+        setIsChecking(false);
+        return;
+      }
       try {
-        const data = await dispatch(refreshTokenThunk()).unwrap();
-        if (data?.token) {
-          setIsValid(true);
-        } else {
-          setIsValid(false);
-        }
+        await dispatch(refreshTokenThunk()).unwrap();
       } catch {
-        setIsValid(false);
       } finally {
         setIsChecking(false);
       }
     };
-
     verifyToken();
-  }, [dispatch]);
+  }, [dispatch, token]);
 
   if (isChecking) return <div>Cargando...</div>;
 
-  return isValid ? children : <Navigate to="/login" replace />;
+  return token ? children : <Navigate to="/login" replace />;
 };
 
 export default PrivateRoute;
