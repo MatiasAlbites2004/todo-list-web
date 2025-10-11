@@ -6,61 +6,43 @@ import FloatingButton from "../../components/FloatingButton/FloatingButton";
 import Modal from "../../components/Modal/Modal";
 import Button from "../../components/Button/Button";
 import TextField from "../../components/TextField/TextField";
-import {
-  setTasks,
-  addTask,
-  updateTask,
-  deleteTask,
-  setEditingTaskId,
-} from "../../store/todoSlice";
+
+import { setTasks, addTask, updateTask, deleteTask, setEditingTaskId } from "../../store/todoSlice";
 import type { Task } from "../../store/todoSlice";
+
 import type { RootState, AppDispatch } from "../../store";
-import {
-  fetchTodos,
-  createTodo,
-  updateTodo,
-  deleteTodo as apiDeleteTodo,
-} from "../../api/todoApi";
+
+import { getTodos, createTodo, updateTodo, deleteTodo as apiDeleteTodo } from "../../services/todoService";
 
 interface FormValues {
   title: string;
-  desc: string;
+  desc?: string;
 }
 
 const TodoList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const tasks = useSelector((state: RootState) => state.todo.tasks);
-  const editingTaskId = useSelector(
-    (state: RootState) => state.todo.editingTaskId
-  );
+  const editingTaskId = useSelector((state: RootState) => state.todo.editingTaskId);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<FormValues>();
-
-  const token = localStorage.getItem("token") ?? "";
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<FormValues>();
 
   useEffect(() => {
     const loadTodos = async () => {
       try {
-        const todosFromApi = await fetchTodos(token);
-        const todos: Task[] = todosFromApi.map((t: any) => ({
-          id: t.id,
-          title: t.title,
-          desc: t.description || "",
+        const todos = await getTodos();
+        const mappedTasks: Task[] = todos.map(todo => ({
+          id: todo.id,
+          title: todo.title,
+          desc: todo.description ?? "",
         }));
-        dispatch(setTasks(todos));
+        dispatch(setTasks(mappedTasks));
       } catch (err) {
         console.error("Error fetching todos:", err);
       }
     };
     loadTodos();
-  }, [dispatch, token]);
+  }, [dispatch]);
 
   useEffect(() => {
     if (editingTaskId !== null) {
@@ -88,23 +70,19 @@ const TodoList: React.FC = () => {
   const onSubmit = async (data: FormValues) => {
     try {
       if (editingTaskId !== null) {
-        const updated = await updateTodo(editingTaskId, data, token);
-        dispatch(
-          updateTask({
-            id: updated.id,
-            title: updated.title,
-            desc: updated.description || "",
-          })
-        );
+        const updated = await updateTodo(editingTaskId, { title: data.title, desc: data.desc });
+        dispatch(updateTask({
+          id: updated.id,
+          title: updated.title,
+          desc: updated.description ?? "",
+        }));
       } else {
-        const created = await createTodo(data, token);
-        dispatch(
-          addTask({
-            id: created.id,
-            title: created.title,
-            desc: created.description || "",
-          })
-        );
+        const created = await createTodo({ title: data.title, desc: data.desc });
+        dispatch(addTask({
+          id: created.id,
+          title: created.title,
+          desc: created.description ?? "",
+        }));
       }
       closeModal();
     } catch (err) {
@@ -114,7 +92,7 @@ const TodoList: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     try {
-      await apiDeleteTodo(id, token);
+      await apiDeleteTodo(id);
       dispatch(deleteTask(id));
     } catch (err) {
       console.error("Error deleting todo:", err);

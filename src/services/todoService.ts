@@ -1,8 +1,3 @@
-interface TodoData {
-  title: string;
-  description?: string;
-}
-
 interface TodoResponse {
   id: number;
   title: string;
@@ -14,43 +9,54 @@ interface TodoResponse {
 
 const BASE_URL = import.meta.env.VITE_API_URL + "/todos";
 
-
 const getAuthHeader = () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("Usuario no autenticado");
-  return { Authorization: `Bearer ${token}`, "Content-Type": "application/json" };
+  return {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 };
 
 export const getTodos = async (): Promise<TodoResponse[]> => {
   const res = await fetch(BASE_URL, { headers: getAuthHeader() });
   if (!res.ok) throw new Error("Error al obtener ToDos");
-  return res.json();
+  const data: TodoResponse[] = await res.json();
+  return data.map((todo) => ({ ...todo, desc: todo.description }));
 };
 
-export const createTodo = async (data: TodoData): Promise<TodoResponse> => {
+export const createTodo = async (data: {
+  title: string;
+  desc?: string;
+}): Promise<TodoResponse> => {
   const res = await fetch(BASE_URL, {
     method: "POST",
     headers: getAuthHeader(),
-    body: JSON.stringify(data),
+    body: JSON.stringify({ title: data.title, description: data.desc }),
   });
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error || "Error al crear ToDo");
   }
-  return res.json();
+  const todo = await res.json();
+  return { ...todo, desc: todo.description };
 };
 
-export const updateTodo = async (id: number, data: TodoData): Promise<TodoResponse> => {
+export const updateTodo = async (
+  id: number,
+  data: { title: string; desc?: string }
+): Promise<TodoResponse> => {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: "PUT",
     headers: getAuthHeader(),
-    body: JSON.stringify(data),
+    body: JSON.stringify({ title: data.title, description: data.desc }),
   });
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error || "Error al actualizar ToDo");
   }
-  return res.json();
+  const todo = await res.json();
+  return { ...todo, desc: todo.description };
 };
 
 export const deleteTodo = async (id: number): Promise<void> => {
