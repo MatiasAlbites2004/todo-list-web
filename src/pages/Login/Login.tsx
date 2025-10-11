@@ -14,9 +14,11 @@ import Card from "../../components/Card/Card";
 
 import { useAppDispatch } from "../../store/hooks";
 import { loginUserThunk } from "../../store/authSlice";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -30,16 +32,16 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       await dispatch(loginUserThunk(data)).unwrap();
+      reset();
 
-      Swal.fire({
+      await Swal.fire({
         title: "¡Bienvenido!",
         text: "Has iniciado sesión correctamente.",
         icon: "success",
         confirmButtonText: "Continuar",
       });
 
-      reset();
-
+      navigate("/todo-list");
     } catch (error: any) {
       Swal.fire({
         title: "Error",
